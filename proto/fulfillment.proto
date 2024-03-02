@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "/fulfillment";
+
+service Fulfillment {
+    rpc RegisterDeliveryPartner (RegisterDeliveryPartnerRequest) returns (DeliveryPartnerResponse) {}
+}
+
+message Location{
+    float xCordinate = 1;
+    float yCordinate = 2;
+}
+
+message RegisterDeliveryPartnerRequest{
+    string username = 1;
+    string password = 2;
+    Location location = 3;
+}
+
+message DeliveryPartnerResponse{
+    int64 id = 1;
+    string username = 2;
+    Location location = 4;
+}
+
+
+
+//protoc --go_out=. --go-grpc_out=. fulfillment.proto
