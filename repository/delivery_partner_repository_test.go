@@ -46,3 +46,37 @@ func TestDeliveryPartnerCreatedSuccessfully(t *testing.T) {
 		t.Fatal("Unexpected Result")
 	}
 }
+
+func TestIsExistsForExistingDeliveryPartnerSuccessfully(t *testing.T) {
+	mock, repo := setUpDeliveryPartnerTest()
+	username := "testUsername"
+
+	rows := sqlmock.NewRows([]string{"count"}).AddRow(1)
+	mock.ExpectQuery("SELECT count(.+) FROM (.+)").
+		WillReturnRows(rows)
+	result := repo.IsExists(username)
+
+	if !result {
+		t.Fatalf("Expected IsExists to return true, but got false")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+}
+
+func TestIsExistsForNonExistingDeliveryPartnerSuccessfully(t *testing.T) {
+	mock, repo := setUpDeliveryPartnerTest()
+	username := "testUsername"
+
+	rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
+	mock.ExpectQuery("SELECT count(.+) FROM (.+)").
+		WillReturnRows(rows)
+	result := repo.IsExists(username)
+
+	if result {
+		t.Fatalf("Expected IsExists to return false, but got true")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+}

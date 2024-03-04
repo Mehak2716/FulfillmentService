@@ -20,3 +20,12 @@ func (repo *DeliveryPartnerRepository) Save(deliveryPartner *models.DeliveryPart
 	}
 	return deliveryPartner, nil
 }
+
+func (repo *DeliveryPartnerRepository) IsExists(username string) bool {
+	var count int64
+	repo.DB.Model(&models.DeliveryPartner{}).
+		Where("delivery_partners.username = ? AND delivery_partners.deleted_at IS NULL", username).
+		Count(&count)
+
+	return count > 0
+}

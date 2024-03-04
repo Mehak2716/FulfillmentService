@@ -16,9 +16,14 @@ type DeliveryPartnerService struct {
 func (service *DeliveryPartnerService) Register(req *pb.RegisterDeliveryPartnerRequest) (*pb.DeliveryPartnerResponse, error) {
 
 	deliveryPartner := mapper.MapToDeliveryPartner(req)
+
+	if service.Repo.IsExists(deliveryPartner.Username) {
+		return nil, status.Errorf(codes.AlreadyExists, "Try with different username")
+	}
+
 	registeredDeliveryPartner, err := service.Repo.Save(&deliveryPartner)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to create menu item")
+		return nil, status.Errorf(codes.Internal, "Failed to register delivery partner")
 	}
 
 	response := mapper.MapToDeliveryPartnerResponse(*registeredDeliveryPartner)
