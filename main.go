@@ -6,7 +6,7 @@ import (
 	"fulfillment/repository"
 	"fulfillment/server"
 	"fulfillment/service"
-	"fulfillment/validation"
+	"fulfillment/utils"
 	"log"
 	"net"
 
@@ -23,8 +23,14 @@ func main() {
 
 	log.Printf("Listening on %s\n", servePort)
 	db := config.DatabaseConnection()
+	deliveryPartnerRepo := repository.DeliveryPartnerRepository{DB: db}
+	deliveryPartnerService := service.DeliveryPartnerService{Repo: deliveryPartnerRepo}
+
+	validator := &utils.Validator{
+		Repo: deliveryPartnerRepo,
+	}
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(validation.RequestValidationHandler),
+		grpc.UnaryInterceptor(validator.ValidationHandler),
 	)
 
 	// givenPoint := geom.NewPointFlat(geom.XY, []float64{1.0, 2.0})
@@ -59,9 +65,6 @@ func main() {
 	// if err := db.Delete(&user).Error; err != nil {
 	// 	fmt.Print(err)
 	// }
-
-	deliveryPartnerRepo := repository.DeliveryPartnerRepository{DB: db}
-	deliveryPartnerService := service.DeliveryPartnerService{Repo: deliveryPartnerRepo}
 
 	server := server.NewFulfillmentServer(deliveryPartnerService)
 	pb.RegisterFulfillmentServer(grpcServer, server)

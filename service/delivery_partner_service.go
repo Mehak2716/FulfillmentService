@@ -38,7 +38,7 @@ func (service *DeliveryPartnerService) GetNearest(req *pb.Location) (*pb.Nearest
 	}
 
 	if nearestDeliveryPartner.ID == 0 {
-		return nil, status.Errorf(codes.Unavailable, "No Delivery Partner Available")
+		return nil, status.Errorf(codes.NotFound, "No available Delivery Partner found.")
 	}
 
 	response := mapper.MapToNearestDeliveryPartnerResponse(*nearestDeliveryPartner)

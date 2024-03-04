@@ -69,7 +69,6 @@ func TestRegisterDeliveryPartnerSuccessfully(t *testing.T) {
 	rowsCount := sqlmock.NewRows([]string{"count"}).AddRow(0)
 	mock.ExpectQuery("SELECT count(.+) FROM (.+)").
 		WillReturnRows(rowsCount)
-
 	mock.ExpectBegin()
 	rows := sqlmock.NewRows([]string{"id", "username", "password"}).AddRow(1, "testUsername", "testPassword")
 	mock.ExpectQuery("INSERT INTO \"delivery_partners\"").WillReturnRows(rows)
@@ -98,7 +97,6 @@ func TestGetNearestDeliveryPartnerSuccessfully(t *testing.T) {
 		AddRow(1, "testUsername", "testPassword", "available")
 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
 		WillReturnRows(rows)
-
 	res, err := service.GetNearest(req)
 
 	if err != nil {
@@ -121,7 +119,6 @@ func TestGetNearestDeliveryPartnerForNoResult(t *testing.T) {
 
 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
 		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "password", "availability"}))
-
 	res, err := service.GetNearest(req)
 
 	if err == nil {

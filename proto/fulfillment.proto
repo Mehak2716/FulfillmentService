@@ -5,6 +5,7 @@ option go_package = "/fulfillment";
 service Fulfillment {
     rpc RegisterDeliveryPartner (RegisterDeliveryPartnerRequest) returns (DeliveryPartnerResponse) {}
     rpc GetNearestDeliveryPartner (Location) returns (NearestDeliveryPartnerResponse) {}
+    rpc UpdateDeliveryStatus (DeliveryStatus) returns (DeliveryResponse){}
 }
 
 message Location{
@@ -29,6 +30,14 @@ message DeliveryPartnerResponse{
 message NearestDeliveryPartnerResponse{
     int64 id = 1;
     string username = 2;
+}
+
+message DeliveryStatus {
+    string status = 1;
+}
+
+message DeliveryResponse {
+    string deliveryResponse = 1;
 }
 
 //protoc --go_out=. --go-grpc_out=. fulfillment.proto
