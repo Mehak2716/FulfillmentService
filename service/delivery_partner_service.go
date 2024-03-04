@@ -1,7 +1,7 @@
 package service
 
 import (
-	"fulfillment/models"
+	"fulfillment/mapper"
 	pb "fulfillment/proto/fulfillment"
 	"fulfillment/repository"
 
@@ -15,25 +15,12 @@ type DeliveryPartnerService struct {
 
 func (service *DeliveryPartnerService) Register(req *pb.RegisterDeliveryPartnerRequest) (*pb.DeliveryPartnerResponse, error) {
 
-	deliveryPartner := models.DeliveryPartner{
-		Username: req.Username,
-		Password: req.Password,
-		Location: models.Location{
-			XCordinate: float64(req.Location.XCordinate),
-			YCordinate: float64(req.Location.YCordinate),
-		}}
-
+	deliveryPartner := mapper.MapToDeliveryPartner(req)
 	registeredDeliveryPartner, err := service.Repo.Save(&deliveryPartner)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to create menu item")
 	}
 
-	response := &pb.DeliveryPartnerResponse{
-		Id:       int64(registeredDeliveryPartner.ID),
-		Username: registeredDeliveryPartner.Username,
-		Location: &pb.Location{
-			XCordinate: float32(registeredDeliveryPartner.Location.XCordinate),
-			YCordinate: float32(registeredDeliveryPartner.Location.YCordinate),
-		}}
+	response := mapper.MapToDeliveryPartnerResponse(*registeredDeliveryPartner)
 	return response, nil
 }

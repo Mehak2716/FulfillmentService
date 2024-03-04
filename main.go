@@ -6,6 +6,7 @@ import (
 	"fulfillment/repository"
 	"fulfillment/server"
 	"fulfillment/service"
+	"fulfillment/validation"
 	"log"
 	"net"
 
@@ -22,7 +23,9 @@ func main() {
 
 	log.Printf("Listening on %s\n", servePort)
 	db := config.DatabaseConnection()
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(validation.RequestValidationHandler),
+	)
 
 	// givenPoint := geom.NewPointFlat(geom.XY, []float64{1.0, 2.0})
 
