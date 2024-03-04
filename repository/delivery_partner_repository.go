@@ -3,8 +3,6 @@ package repository
 import (
 	"fulfillment/models"
 
-	"github.com/jackc/pgx/v5/pgconn"
-
 	"gorm.io/gorm"
 )
 
@@ -16,7 +14,7 @@ func (repo *DeliveryPartnerRepository) Save(deliveryPartner *models.DeliveryPart
 	res := repo.DB.Create(deliveryPartner)
 
 	if res.Error != nil {
-		return nil, res.Error.(*pgconn.PgError)
+		return nil, res.Error
 	}
 	return deliveryPartner, nil
 }
@@ -28,4 +26,26 @@ func (repo *DeliveryPartnerRepository) IsExists(username string) bool {
 		Count(&count)
 
 	return count > 0
+}
+
+func (repo *DeliveryPartnerRepository) FetchNearest(xCordinate float64, yCordinate float64) (*models.DeliveryPartner, error) {
+	var nearestDeliveryPartner models.DeliveryPartner
+
+	res := repo.DB.Raw(`
+    SELECT delivery_partners.*
+    FROM locations
+    JOIN delivery_partners ON delivery_partners.id = locations.user_id
+    WHERE delivery_partners.availability = 'available'
+    ORDER BY ST_Distance(
+        ST_MakePoint(?, ?)::geography,
+        ST_MakePoint(locations.x_cordinate, locations.y_cordinate)::geography
+    ) LIMIT 1
+`, xCordinate, yCordinate).Scan(&nearestDeliveryPartner)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return &nearestDeliveryPartner, nil
+
 }

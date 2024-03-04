@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FulfillmentClient interface {
 	RegisterDeliveryPartner(ctx context.Context, in *RegisterDeliveryPartnerRequest, opts ...grpc.CallOption) (*DeliveryPartnerResponse, error)
+	GetNearestDeliveryPartner(ctx context.Context, in *Location, opts ...grpc.CallOption) (*NearestDeliveryPartnerResponse, error)
 }
 
 type fulfillmentClient struct {
@@ -42,11 +43,21 @@ func (c *fulfillmentClient) RegisterDeliveryPartner(ctx context.Context, in *Reg
 	return out, nil
 }
 
+func (c *fulfillmentClient) GetNearestDeliveryPartner(ctx context.Context, in *Location, opts ...grpc.CallOption) (*NearestDeliveryPartnerResponse, error) {
+	out := new(NearestDeliveryPartnerResponse)
+	err := c.cc.Invoke(ctx, "/Fulfillment/GetNearestDeliveryPartner", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FulfillmentServer is the server API for Fulfillment service.
 // All implementations must embed UnimplementedFulfillmentServer
 // for forward compatibility
 type FulfillmentServer interface {
 	RegisterDeliveryPartner(context.Context, *RegisterDeliveryPartnerRequest) (*DeliveryPartnerResponse, error)
+	GetNearestDeliveryPartner(context.Context, *Location) (*NearestDeliveryPartnerResponse, error)
 	mustEmbedUnimplementedFulfillmentServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedFulfillmentServer struct {
 
 func (UnimplementedFulfillmentServer) RegisterDeliveryPartner(context.Context, *RegisterDeliveryPartnerRequest) (*DeliveryPartnerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterDeliveryPartner not implemented")
+}
+func (UnimplementedFulfillmentServer) GetNearestDeliveryPartner(context.Context, *Location) (*NearestDeliveryPartnerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNearestDeliveryPartner not implemented")
 }
 func (UnimplementedFulfillmentServer) mustEmbedUnimplementedFulfillmentServer() {}
 
@@ -88,6 +102,24 @@ func _Fulfillment_RegisterDeliveryPartner_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Fulfillment_GetNearestDeliveryPartner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Location)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FulfillmentServer).GetNearestDeliveryPartner(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Fulfillment/GetNearestDeliveryPartner",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FulfillmentServer).GetNearestDeliveryPartner(ctx, req.(*Location))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Fulfillment_ServiceDesc is the grpc.ServiceDesc for Fulfillment service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var Fulfillment_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterDeliveryPartner",
 			Handler:    _Fulfillment_RegisterDeliveryPartner_Handler,
+		},
+		{
+			MethodName: "GetNearestDeliveryPartner",
+			Handler:    _Fulfillment_GetNearestDeliveryPartner_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

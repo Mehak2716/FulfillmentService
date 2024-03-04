@@ -29,3 +29,18 @@ func (service *DeliveryPartnerService) Register(req *pb.RegisterDeliveryPartnerR
 	response := mapper.MapToDeliveryPartnerResponse(*registeredDeliveryPartner)
 	return response, nil
 }
+
+func (service *DeliveryPartnerService) GetNearest(req *pb.Location) (*pb.NearestDeliveryPartnerResponse, error) {
+
+	nearestDeliveryPartner, err := service.Repo.FetchNearest(float64(req.XCordinate), float64(req.YCordinate))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to assign delivery partner")
+	}
+
+	if nearestDeliveryPartner.ID == 0 {
+		return nil, status.Errorf(codes.Unavailable, "No Delivery Partner Available")
+	}
+
+	response := mapper.MapToNearestDeliveryPartnerResponse(*nearestDeliveryPartner)
+	return response, nil
+}

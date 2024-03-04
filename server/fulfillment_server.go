@@ -21,3 +21,8 @@ func (server *FulfillmentServer) RegisterDeliveryPartner(ctx context.Context, re
 	return server.deliveryPartnerService.Register(req)
 
 }
+
+func (server *FulfillmentServer) GetNearestDeliveryPartner(ctx context.Context, req *pb.Location) (*pb.NearestDeliveryPartnerResponse, error) {
+
+	return server.deliveryPartnerService.GetNearest(req)
+}
