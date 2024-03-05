@@ -42,5 +42,11 @@ func (service *DeliveryPartnerService) GetNearest(req *pb.Location) (*pb.Nearest
 	}
 
 	response := mapper.MapToNearestDeliveryPartnerResponse(*nearestDeliveryPartner)
+
 	return response, nil
+}
+
+func (service *DeliveryPartnerService) UpdateStatus(req *pb.DeliveryStatus) (*pb.DeliveryResponse, error) {
+	return nil, nil
+
 }

@@ -4,9 +4,9 @@ import (
 	"fulfillment/config"
 	pb "fulfillment/proto/fulfillment"
 	"fulfillment/repository"
+	"fulfillment/security"
 	"fulfillment/server"
 	"fulfillment/service"
-	"fulfillment/utils"
 	"log"
 	"net"
 
@@ -26,45 +26,12 @@ func main() {
 	deliveryPartnerRepo := repository.DeliveryPartnerRepository{DB: db}
 	deliveryPartnerService := service.DeliveryPartnerService{Repo: deliveryPartnerRepo}
 
-	validator := &utils.Validator{
-		Repo: deliveryPartnerRepo,
+	interceptor := &security.Interceptor{
+		Auth: security.Auth{Repo: deliveryPartnerRepo},
 	}
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(validator.ValidationHandler),
+		grpc.UnaryInterceptor(interceptor.RequestHandler),
 	)
-
-	// givenPoint := geom.NewPointFlat(geom.XY, []float64{1.0, 2.0})
-
-	// user := models.DeliveryPartner{
-	// 	Username: "koplu",
-	// 	Password: "abc",
-	// 	Location: models.Location{
-	// 		XCordinate: 30,
-	// 		YCordinate: 20},
-	// }
-
-	// db.Create(&user)
-
-	// var nearestLocation models.Location
-	// err = db.Raw("SELECT * FROM locations ORDER BY ST_Distance(ST_MakePoint(?, ?)::geography, ST_MakePoint(locations.x_cordinate, locations.y_cordinate)::geography) LIMIT 1", givenPoint.Coords()[0], givenPoint.Coords()[1]).Scan(&nearestLocation).Error
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Print(nearestLocation)
-
-	// var locations models.Location
-
-	// // Find locations by UserID
-	// if err := db.Where("user_id = ?", 1).Find(&locations).Error; err != nil {
-	// }
-	// fmt.Print(locations)
-
-	// // userToDelete := models.DeliveryPartner{Model: gorm.Model{ID: 1}}
-	// fmt.Print(user.ID)
-	// if err := db.Delete(&user).Error; err != nil {
-	// 	fmt.Print(err)
-	// }
 
 	server := server.NewFulfillmentServer(deliveryPartnerService)
 	pb.RegisterFulfillmentServer(grpcServer, server)

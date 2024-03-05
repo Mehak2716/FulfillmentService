@@ -19,10 +19,14 @@ func NewFulfillmentServer(deliveryPartnerService service.DeliveryPartnerService)
 
 func (server *FulfillmentServer) RegisterDeliveryPartner(ctx context.Context, req *pb.RegisterDeliveryPartnerRequest) (*pb.DeliveryPartnerResponse, error) {
 	return server.deliveryPartnerService.Register(req)
-
 }
 
 func (server *FulfillmentServer) GetNearestDeliveryPartner(ctx context.Context, req *pb.Location) (*pb.NearestDeliveryPartnerResponse, error) {
 
 	return server.deliveryPartnerService.GetNearest(req)
+}
+
+func (server *FulfillmentServer) UpdateDeliveryStatus(ctx context.Context, req *pb.DeliveryStatus) (*pb.DeliveryResponse, error) {
+
+	return server.deliveryPartnerService.UpdateStatus(req)
 }
