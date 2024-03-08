@@ -48,3 +48,25 @@ func (repo *DeliveryPartnerRepository) FetchNearest(location models.Location) (*
 	return &nearestDeliveryPartner, nil
 
 }
+
+func (repo *DeliveryPartnerRepository) Fetch(ID int64) (*models.DeliveryPartner, error) {
+
+	var deliveryPartner models.DeliveryPartner
+	res := repo.DB.Where("id = ?", ID).First(&deliveryPartner)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return &deliveryPartner, nil
+}
+
+func (repo *DeliveryPartnerRepository) Update(deliveryPartner *models.DeliveryPartner) error {
+
+	res := repo.DB.Save(deliveryPartner)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}

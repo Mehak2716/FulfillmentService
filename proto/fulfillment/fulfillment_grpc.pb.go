@@ -110,7 +110,7 @@ var DeliveryPartnerService_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DeliveryServiceClient interface {
 	InitiateDelivery(ctx context.Context, in *DeliveryRequest, opts ...grpc.CallOption) (*Response, error)
-	UpdateDeliveryStatus(ctx context.Context, in *DeliveryStatusRequest, opts ...grpc.CallOption) (*Response, error)
+	MarkDelivered(ctx context.Context, in *DeliveredRequest, opts ...grpc.CallOption) (*DeliveredResponse, error)
 }
 
 type deliveryServiceClient struct {
@@ -130,9 +130,9 @@ func (c *deliveryServiceClient) InitiateDelivery(ctx context.Context, in *Delive
 	return out, nil
 }
 
-func (c *deliveryServiceClient) UpdateDeliveryStatus(ctx context.Context, in *DeliveryStatusRequest, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
-	err := c.cc.Invoke(ctx, "/DeliveryService/UpdateDeliveryStatus", in, out, opts...)
+func (c *deliveryServiceClient) MarkDelivered(ctx context.Context, in *DeliveredRequest, opts ...grpc.CallOption) (*DeliveredResponse, error) {
+	out := new(DeliveredResponse)
+	err := c.cc.Invoke(ctx, "/DeliveryService/MarkDelivered", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (c *deliveryServiceClient) UpdateDeliveryStatus(ctx context.Context, in *De
 // for forward compatibility
 type DeliveryServiceServer interface {
 	InitiateDelivery(context.Context, *DeliveryRequest) (*Response, error)
-	UpdateDeliveryStatus(context.Context, *DeliveryStatusRequest) (*Response, error)
+	MarkDelivered(context.Context, *DeliveredRequest) (*DeliveredResponse, error)
 	mustEmbedUnimplementedDeliveryServiceServer()
 }
 
@@ -155,8 +155,8 @@ type UnimplementedDeliveryServiceServer struct {
 func (UnimplementedDeliveryServiceServer) InitiateDelivery(context.Context, *DeliveryRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InitiateDelivery not implemented")
 }
-func (UnimplementedDeliveryServiceServer) UpdateDeliveryStatus(context.Context, *DeliveryStatusRequest) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateDeliveryStatus not implemented")
+func (UnimplementedDeliveryServiceServer) MarkDelivered(context.Context, *DeliveredRequest) (*DeliveredResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MarkDelivered not implemented")
 }
 func (UnimplementedDeliveryServiceServer) mustEmbedUnimplementedDeliveryServiceServer() {}
 
@@ -189,20 +189,20 @@ func _DeliveryService_InitiateDelivery_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DeliveryService_UpdateDeliveryStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeliveryStatusRequest)
+func _DeliveryService_MarkDelivered_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeliveredRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DeliveryServiceServer).UpdateDeliveryStatus(ctx, in)
+		return srv.(DeliveryServiceServer).MarkDelivered(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/DeliveryService/UpdateDeliveryStatus",
+		FullMethod: "/DeliveryService/MarkDelivered",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DeliveryServiceServer).UpdateDeliveryStatus(ctx, req.(*DeliveryStatusRequest))
+		return srv.(DeliveryServiceServer).MarkDelivered(ctx, req.(*DeliveredRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -219,8 +219,8 @@ var DeliveryService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DeliveryService_InitiateDelivery_Handler,
 		},
 		{
-			MethodName: "UpdateDeliveryStatus",
-			Handler:    _DeliveryService_UpdateDeliveryStatus_Handler,
+			MethodName: "MarkDelivered",
+			Handler:    _DeliveryService_MarkDelivered_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

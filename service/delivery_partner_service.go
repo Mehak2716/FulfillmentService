@@ -44,3 +44,19 @@ func (service *DeliveryPartnerService) GetNearest(location models.Location) (*mo
 
 	return nearestDeliveryPartner, nil
 }
+
+func (service *DeliveryPartnerService) UpdateAvailability(id int64, availability string) error {
+
+	deliveryPartner, err := service.Repo.Fetch(id)
+	if deliveryPartner == nil {
+		return status.Errorf(codes.NotFound, "deliveryPartner not found.")
+	}
+
+	deliveryPartner.UpdateAvailability(availability)
+	service.Repo.Update(deliveryPartner)
+	if err != nil {
+		return status.Errorf(codes.Internal, "Failed to update availability")
+	}
+
+	return nil
+}

@@ -9,3 +9,7 @@ type DeliveryPartner struct {
 	Location     Location `gorm:"embedded"`
 	Availability string   `gorm:"not null"`
 }
+
+func (deliveryPartner *DeliveryPartner) UpdateAvailability(availability string) {
+	deliveryPartner.Availability = availability
+}

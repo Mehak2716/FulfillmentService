@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "/fulfillment";
 
 service DeliveryPartnerService {
@@ -7,8 +9,8 @@ service DeliveryPartnerService {
 }
 
 service DeliveryService{
-    rpc InitiateDelivery (DeliveryRequest) returns (response) {}
-    rpc UpdateDeliveryStatus (DeliveryStatusRequest) returns (response){}
+    rpc InitiateDelivery (DeliveryRequest) returns (Response) {}
+    rpc MarkDelivered (DeliveredRequest) returns (DeliveredResponse){}
 }
 
 message Location{
@@ -36,13 +38,20 @@ message DeliveryRequest{
     Location deliveryLocation = 3;
 }
 
-message DeliveryStatusRequest {
+message DeliveredRequest {
     int64 orderId = 1;
-    string status = 2;
 }
 
-message response {
+message Response{
     string message = 1;
+}
+
+message DeliveredResponse {
+    int64 orderId =1;
+    int64 deliveryParterId = 2;
+    Location deliveryLocation = 3;
+    google.protobuf.Timestamp deliveredAt = 4;
+
 }
 
 //protoc --go_out=. --go-grpc_out=. fulfillment.proto

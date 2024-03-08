@@ -17,13 +17,12 @@ func NewDeliveryServiceServer(deliveryService service.DeliveryService) *Delivery
 	}
 }
 
-
 func (server *DeliveryServiceServer) InitiateDelivery(ctx context.Context, req *pb.DeliveryRequest) (*pb.Response, error) {
 
 	return server.deliveryService.Initiate(req)
 }
 
-func (server *DeliveryServiceServer) UpdateDeliveryStatus(ctx context.Context, req *pb.DeliveryStatusRequest) (*pb.Response, error) {
+func (server *DeliveryServiceServer) MarkDelivered(ctx context.Context, req *pb.DeliveredRequest) (*pb.DeliveredResponse, error) {
 
-	return server.deliveryService.UpdateStatus(req)
+	return server.deliveryService.MarkDelivered(req)
 }

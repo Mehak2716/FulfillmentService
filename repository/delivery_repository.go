@@ -18,3 +18,25 @@ func (repo *DeliveryRepository) Save(delivery *models.Delivery) error {
 	}
 	return nil
 }
+
+func (repo *DeliveryRepository) Fetch(orderID int64) (*models.Delivery, error) {
+
+	var delivery models.Delivery
+	res := repo.DB.Where("order_id = ?", orderID).First(&delivery)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return &delivery, nil
+}
+
+func (repo *DeliveryRepository) Update(delivery *models.Delivery) (*models.Delivery, error) {
+
+	res := repo.DB.Save(delivery)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return delivery, nil
+}
