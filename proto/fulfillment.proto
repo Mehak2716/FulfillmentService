@@ -2,10 +2,13 @@ syntax = "proto3";
 
 option go_package = "/fulfillment";
 
-service Fulfillment {
-    rpc RegisterDeliveryPartner (RegisterDeliveryPartnerRequest) returns (DeliveryPartnerResponse) {}
-    rpc GetNearestDeliveryPartner (Location) returns (NearestDeliveryPartnerResponse) {}
-    rpc UpdateDeliveryStatus (DeliveryStatus) returns (DeliveryResponse){}
+service DeliveryPartnerService {
+    rpc RegisterDeliveryPartner (RegisterDeliveryPartnerRequest) returns (DeliveryPartner) {}
+}
+
+service DeliveryService{
+    rpc initiateDelivery (DeliveryRequest) returns (response) {}
+    rpc UpdateDeliveryStatus (DeliveryStatusRequest) returns (response){}
 }
 
 message Location{
@@ -20,24 +23,26 @@ message RegisterDeliveryPartnerRequest{
     string availability = 4;
 }
 
-message DeliveryPartnerResponse{
+message DeliveryPartner{
     int64 id = 1;
     string username = 2;
     Location location = 3;
     string availability = 4;
 }
 
-message NearestDeliveryPartnerResponse{
-    int64 id = 1;
-    string username = 2;
+message DeliveryRequest{
+    int64 orderId = 1;
+    Location pickUpLocation = 2;
+    Location deliveryLocation = 3;
 }
 
-message DeliveryStatus {
-    string status = 1;
+message DeliveryStatusRequest {
+    int64 orderId = 1;
+    string status = 2;
 }
 
-message DeliveryResponse {
-    string deliveryResponse = 1;
+message response {
+    string message = 1;
 }
 
 //protoc --go_out=. --go-grpc_out=. fulfillment.proto
