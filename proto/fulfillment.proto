@@ -7,7 +7,7 @@ service DeliveryPartnerService {
 }
 
 service DeliveryService{
-    rpc initiateDelivery (DeliveryRequest) returns (response) {}
+    rpc InitiateDelivery (DeliveryRequest) returns (response) {}
     rpc UpdateDeliveryStatus (DeliveryStatusRequest) returns (response){}
 }
 

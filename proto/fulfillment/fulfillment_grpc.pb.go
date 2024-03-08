@@ -123,7 +123,7 @@ func NewDeliveryServiceClient(cc grpc.ClientConnInterface) DeliveryServiceClient
 
 func (c *deliveryServiceClient) InitiateDelivery(ctx context.Context, in *DeliveryRequest, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/DeliveryService/initiateDelivery", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/DeliveryService/InitiateDelivery", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func _DeliveryService_InitiateDelivery_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/DeliveryService/initiateDelivery",
+		FullMethod: "/DeliveryService/InitiateDelivery",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DeliveryServiceServer).InitiateDelivery(ctx, req.(*DeliveryRequest))
@@ -215,7 +215,7 @@ var DeliveryService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*DeliveryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "initiateDelivery",
+			MethodName: "InitiateDelivery",
 			Handler:    _DeliveryService_InitiateDelivery_Handler,
 		},
 		{

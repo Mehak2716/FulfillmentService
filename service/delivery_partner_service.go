@@ -2,6 +2,7 @@ package service
 
 import (
 	"fulfillment/mapper"
+	"fulfillment/models"
 	pb "fulfillment/proto/fulfillment"
 	"fulfillment/repository"
 
@@ -13,7 +14,7 @@ type DeliveryPartnerService struct {
 	Repo repository.DeliveryPartnerRepository
 }
 
-func (service *DeliveryPartnerService) Register(req *pb.RegisterDeliveryPartnerRequest) (*pb.DeliveryPartnerResponse, error) {
+func (service *DeliveryPartnerService) Register(req *pb.RegisterDeliveryPartnerRequest) (*pb.DeliveryPartner, error) {
 
 	deliveryPartner := mapper.MapToDeliveryPartner(req)
 
@@ -30,9 +31,9 @@ func (service *DeliveryPartnerService) Register(req *pb.RegisterDeliveryPartnerR
 	return response, nil
 }
 
-func (service *DeliveryPartnerService) GetNearest(req *pb.Location) (*pb.NearestDeliveryPartnerResponse, error) {
+func (service *DeliveryPartnerService) GetNearest(location models.Location) (*models.DeliveryPartner, error) {
 
-	nearestDeliveryPartner, err := service.Repo.FetchNearest(float64(req.XCordinate), float64(req.YCordinate))
+	nearestDeliveryPartner, err := service.Repo.FetchNearest(float64(location.XCordinate), float64(location.YCordinate))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to assign delivery partner")
 	}
@@ -41,12 +42,5 @@ func (service *DeliveryPartnerService) GetNearest(req *pb.Location) (*pb.Nearest
 		return nil, status.Errorf(codes.NotFound, "No available Delivery Partner found.")
 	}
 
-	response := mapper.MapToNearestDeliveryPartnerResponse(*nearestDeliveryPartner)
-
-	return response, nil
-}
-
-func (service *DeliveryPartnerService) UpdateStatus(req *pb.DeliveryStatus) (*pb.DeliveryResponse, error) {
-	return nil, nil
-
+	return nearestDeliveryPartner, nil
 }

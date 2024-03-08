@@ -15,7 +15,7 @@ type Interceptor struct {
 	Auth Auth
 }
 
-func (interceptor *Interceptor) ValidateRequest(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (interceptor *Interceptor) RequestHandler(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	log.Printf("Intercepting unary request: %v\n", info.FullMethod)
 
 	switch info.FullMethod {
@@ -32,22 +32,22 @@ func (interceptor *Interceptor) ValidateRequest(ctx context.Context, req interfa
 			return nil, status.Error(codes.InvalidArgument, "Enter valid availability status ie. available or unavailable.")
 		}
 
-	case "/Fulfillment/GetNearestDeliveryPartner":
+		// case "/Fulfillment/GetNearestDeliveryPartner":
 
-		r := req.(*pb.Location)
-		if r == nil || r.XCordinate <= 0 || r.YCordinate <= 0 {
-			return nil, status.Error(codes.InvalidArgument, "Provide valid location")
-		}
+		// 	r := req.(*pb.Location)
+		// 	if r == nil || r.XCordinate <= 0 || r.YCordinate <= 0 {
+		// 		return nil, status.Error(codes.InvalidArgument, "Provide valid location")
+		// 	}
 
-	case "/Fulfillment/UpdateDeliveryStatus":
+		// case "/Fulfillment/UpdateDeliveryStatus":
 
-		if err := interceptor.Auth.isAuthenticated(ctx); err != nil {
-			return nil, err
-		}
-		r := req.(*pb.DeliveryStatus)
-		if r == nil || (r.Status != "Delivered" && r.Status != "Assigned") {
-			return nil, status.Error(codes.InvalidArgument, "Provide valid status i.e Delivered or Assigned")
-		}
+		// 	if err := interceptor.Auth.isAuthenticated(ctx); err != nil {
+		// 		return nil, err
+		// 	}
+		// 	r := req.(*pb.DeliveryStatus)
+		// 	if r == nil || (r.Status != "Delivered" && r.Status != "Assigned") {
+		// 		return nil, status.Error(codes.InvalidArgument, "Provide valid status i.e Delivered or Assigned")
+		// 	}
 	}
 	resp, err := handler(ctx, req)
 	return resp, err
