@@ -9,6 +9,9 @@ import (
 	"fulfillment/service"
 	"log"
 	"net"
+	"os"
+
+	"github.com/joho/godotenv"
 
 	"google.golang.org/grpc"
 )
@@ -16,6 +19,13 @@ import (
 const servePort string = ":9000"
 
 func main() {
+	err := godotenv.Load(".env")
+	servePort := os.Getenv("SERVER_PORT")
+
+	if err != nil {
+		log.Fatalf("Error loading env file %v", err)
+	}
+
 	lis, err := net.Listen("tcp", servePort)
 	if err != nil {
 		log.Fatalf("Failed to start server %v", err)
