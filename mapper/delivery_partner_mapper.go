@@ -19,9 +19,9 @@ func MapToDeliveryPartner(req *pb.RegisterDeliveryPartnerRequest) models.Deliver
 
 }
 
-func MapToDeliveryPartnerResponse(deliveryPartner models.DeliveryPartner) *pb.DeliveryPartnerResponse {
+func MapToDeliveryPartnerResponse(deliveryPartner models.DeliveryPartner) *pb.DeliveryPartner {
 
-	return &pb.DeliveryPartnerResponse{
+	return &pb.DeliveryPartner{
 		Id:       int64(deliveryPartner.ID),
 		Username: deliveryPartner.Username,
 		Location: &pb.Location{
@@ -29,13 +29,5 @@ func MapToDeliveryPartnerResponse(deliveryPartner models.DeliveryPartner) *pb.De
 			YCordinate: float32(deliveryPartner.Location.YCordinate),
 		},
 		Availability: deliveryPartner.Availability,
-	}
-}
-
-func MapToNearestDeliveryPartnerResponse(deliveryPartner models.DeliveryPartner) *pb.NearestDeliveryPartnerResponse {
-
-	return &pb.NearestDeliveryPartnerResponse{
-		Id:       int64(deliveryPartner.ID),
-		Username: deliveryPartner.Username,
 	}
 }

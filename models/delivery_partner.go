@@ -6,6 +6,6 @@ type DeliveryPartner struct {
 	gorm.Model
 	Username     string   `gorm:"unique;not null"`
 	Password     string   `gorm:"not null"`
-	Location     Location `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-	Availability string
+	Location     Location `gorm:"embedded"`
+	Availability string   `gorm:"not null"`
 }

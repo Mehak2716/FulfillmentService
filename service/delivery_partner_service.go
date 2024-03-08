@@ -33,7 +33,7 @@ func (service *DeliveryPartnerService) Register(req *pb.RegisterDeliveryPartnerR
 
 func (service *DeliveryPartnerService) GetNearest(location models.Location) (*models.DeliveryPartner, error) {
 
-	nearestDeliveryPartner, err := service.Repo.FetchNearest(float64(location.XCordinate), float64(location.YCordinate))
+	nearestDeliveryPartner, err := service.Repo.FetchNearest(location)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to assign delivery partner")
 	}

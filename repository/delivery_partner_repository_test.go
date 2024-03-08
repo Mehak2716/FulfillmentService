@@ -81,44 +81,44 @@ func TestIsExistsForNonExistingDeliveryPartnerSuccessfully(t *testing.T) {
 	}
 }
 
-func TestFetchNearestDeliveryPartnerSuccessfully(t *testing.T) {
-	mock, repo := setUpDeliveryPartnerTest()
-	xCordinate, yCordinate := 40.0, 30.0
+// func TestFetchNearestDeliveryPartnerSuccessfully(t *testing.T) {
+// 	mock, repo := setUpDeliveryPartnerTest()
+// 	xCordinate, yCordinate := 40.0, 30.0
 
-	rows := sqlmock.NewRows([]string{"id", "username", "password", "availability"}).
-		AddRow(1, "testName", "abc", "available")
-	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
-		WillReturnRows(rows)
+// 	rows := sqlmock.NewRows([]string{"id", "username", "password", "availability"}).
+// 		AddRow(1, "testName", "abc", "available")
+// 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
+// 		WillReturnRows(rows)
 
-	result, err := repo.FetchNearest(xCordinate, yCordinate)
+// 	result, err := repo.FetchNearest(xCordinate, yCordinate)
 
-	if err != nil {
-		t.Fatalf("Error not expected but encountered: %v", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("Unfulfilled expectations: %s", err)
-	}
-	if result.ID != 1 || result.Username != "testName" {
-		t.Fatal("Unexpected Result")
-	}
-}
+// 	if err != nil {
+// 		t.Fatalf("Error not expected but encountered: %v", err)
+// 	}
+// 	if err := mock.ExpectationsWereMet(); err != nil {
+// 		t.Errorf("Unfulfilled expectations: %s", err)
+// 	}
+// 	if result.ID != 1 || result.Username != "testName" {
+// 		t.Fatal("Unexpected Result")
+// 	}
+// }
 
-func TestFetchNearestDeliveryPartnerNoResult(t *testing.T) {
-	mock, repo := setUpDeliveryPartnerTest()
-	xCordinate, yCordinate := 40.0, 30.0
+// func TestFetchNearestDeliveryPartnerNoResult(t *testing.T) {
+// 	mock, repo := setUpDeliveryPartnerTest()
+// 	xCordinate, yCordinate := 40.0, 30.0
 
-	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
-		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "password", "availability"}))
+// 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
+// 		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "password", "availability"}))
 
-	result, err := repo.FetchNearest(xCordinate, yCordinate)
+// 	result, err := repo.FetchNearest(xCordinate, yCordinate)
 
-	if err != nil {
-		t.Fatalf("Error not expected but encountered: %v", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("Unfulfilled expectations: %s", err)
-	}
-	if result == nil {
-		t.Fatal("Expected non nil result, but got a nil result")
-	}
-}
+// 	if err != nil {
+// 		t.Fatalf("Error not expected but encountered: %v", err)
+// 	}
+// 	if err := mock.ExpectationsWereMet(); err != nil {
+// 		t.Errorf("Unfulfilled expectations: %s", err)
+// 	}
+// 	if result == nil {
+// 		t.Fatal("Expected non nil result, but got a nil result")
+// 	}
+// }

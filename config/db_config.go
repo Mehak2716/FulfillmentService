@@ -19,6 +19,6 @@ func DatabaseConnection() *gorm.DB {
 	}
 
 	log.Println("Database connection successful...")
-	db.AutoMigrate(&models.DeliveryPartner{}, &models.Location{})
+	db.AutoMigrate(&models.DeliveryPartner{}, &models.Delivery{})
 	return db
 }

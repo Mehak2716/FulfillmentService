@@ -28,19 +28,18 @@ func (repo *DeliveryPartnerRepository) IsExists(username string) bool {
 	return count > 0
 }
 
-func (repo *DeliveryPartnerRepository) FetchNearest(xCordinate float64, yCordinate float64) (*models.DeliveryPartner, error) {
+func (repo *DeliveryPartnerRepository) FetchNearest(location models.Location) (*models.DeliveryPartner, error) {
 	var nearestDeliveryPartner models.DeliveryPartner
 
 	res := repo.DB.Raw(`
     SELECT delivery_partners.*
-    FROM locations
-    JOIN delivery_partners ON delivery_partners.id = locations.user_id
+    FROM delivery_partners
     WHERE delivery_partners.availability = 'available'
     ORDER BY ST_Distance(
         ST_MakePoint(?, ?)::geography,
-        ST_MakePoint(locations.x_cordinate, locations.y_cordinate)::geography
+        ST_MakePoint(delivery_partners.x_cordinate, delivery_partners.y_cordinate)::geography
     ) LIMIT 1
-`, xCordinate, yCordinate).Scan(&nearestDeliveryPartner)
+`, location.XCordinate, location.YCordinate).Scan(&nearestDeliveryPartner)
 
 	if res.Error != nil {
 		return nil, res.Error
