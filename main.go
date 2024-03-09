@@ -21,7 +21,6 @@ const servePort string = ":9000"
 func main() {
 	err := godotenv.Load(".env")
 	servePort := os.Getenv("SERVER_PORT")
-
 	if err != nil {
 		log.Fatalf("Error loading env file %v", err)
 	}
@@ -30,8 +29,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to start server %v", err)
 	}
-
 	log.Printf("Listening on %s\n", servePort)
+
 	db := config.DatabaseConnection()
 	deliveryPartnerRepo := repository.DeliveryPartnerRepository{DB: db}
 	deliveryPartnerService := service.DeliveryPartnerService{Repo: deliveryPartnerRepo}

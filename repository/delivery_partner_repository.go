@@ -44,9 +44,7 @@ func (repo *DeliveryPartnerRepository) FetchNearest(location models.Location) (*
 	if res.Error != nil {
 		return nil, res.Error
 	}
-
 	return &nearestDeliveryPartner, nil
-
 }
 
 func (repo *DeliveryPartnerRepository) Fetch(ID int64) (*models.DeliveryPartner, error) {
@@ -63,7 +61,6 @@ func (repo *DeliveryPartnerRepository) Fetch(ID int64) (*models.DeliveryPartner,
 func (repo *DeliveryPartnerRepository) Update(deliveryPartner *models.DeliveryPartner) error {
 
 	res := repo.DB.Save(deliveryPartner)
-
 	if res.Error != nil {
 		return res.Error
 	}

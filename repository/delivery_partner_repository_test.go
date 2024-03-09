@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"fulfillment/models"
 	"testing"
 
@@ -81,44 +82,77 @@ func TestIsExistsForNonExistingDeliveryPartnerSuccessfully(t *testing.T) {
 	}
 }
 
-// func TestFetchNearestDeliveryPartnerSuccessfully(t *testing.T) {
-// 	mock, repo := setUpDeliveryPartnerTest()
-// 	xCordinate, yCordinate := 40.0, 30.0
+func TestFetchNearestDeliveryPartner(t *testing.T) {
+	mock, repo := setUpDeliveryPartnerTest()
+	location := models.Location{
+		XCordinate: 40.0,
+		YCordinate: 30.0,
+	}
 
-// 	rows := sqlmock.NewRows([]string{"id", "username", "password", "availability"}).
-// 		AddRow(1, "testName", "abc", "available")
-// 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
-// 		WillReturnRows(rows)
+	mock.ExpectQuery("SELECT delivery_partners.* FROM delivery_partners").
+		WithArgs(location.XCordinate, location.YCordinate).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "x_cordinate", "y_cordinate", "availability"}).
+			AddRow(1, "testName1", 40.05, 30.05, "available").
+			AddRow(2, "testName2", 40.2, 30.2, "available").
+			AddRow(3, "testName3", 40.3, 30.3, "available"))
 
-// 	result, err := repo.FetchNearest(xCordinate, yCordinate)
+	result, err := repo.FetchNearest(location)
 
-// 	if err != nil {
-// 		t.Fatalf("Error not expected but encountered: %v", err)
-// 	}
-// 	if err := mock.ExpectationsWereMet(); err != nil {
-// 		t.Errorf("Unfulfilled expectations: %s", err)
-// 	}
-// 	if result.ID != 1 || result.Username != "testName" {
-// 		t.Fatal("Unexpected Result")
-// 	}
-// }
+	fmt.Print(result.ID)
+	if err != nil {
+		t.Fatalf("Error not expected but encountered: %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+	if result.ID != 1 {
+		t.Fatal("Unexpected Result: The nearest partner should have ID 1")
+	}
+}
 
-// func TestFetchNearestDeliveryPartnerNoResult(t *testing.T) {
-// 	mock, repo := setUpDeliveryPartnerTest()
-// 	xCordinate, yCordinate := 40.0, 30.0
+func TestFetchNearestDeliveryPartnerWithNoResult(t *testing.T) {
+	mock, repo := setUpDeliveryPartnerTest()
+	location := models.Location{
+		XCordinate: 40.0,
+		YCordinate: 30.0,
+	}
 
-// 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
-// 		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "password", "availability"}))
+	mock.ExpectQuery("SELECT delivery_partners.* FROM delivery_partners").
+		WithArgs(location.XCordinate, location.YCordinate).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "x_cordinate", "y_cordinate", "availability"}))
 
-// 	result, err := repo.FetchNearest(xCordinate, yCordinate)
+	result, err := repo.FetchNearest(location)
 
-// 	if err != nil {
-// 		t.Fatalf("Error not expected but encountered: %v", err)
-// 	}
-// 	if err := mock.ExpectationsWereMet(); err != nil {
-// 		t.Errorf("Unfulfilled expectations: %s", err)
-// 	}
-// 	if result == nil {
-// 		t.Fatal("Expected non nil result, but got a nil result")
-// 	}
-// }
+	fmt.Print(result)
+	if err != nil {
+		t.Fatalf("Error not expected but encountered: %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+	if result.ID != 0 {
+		t.Fatal("Expected no result, but got a non nil result")
+	}
+}
+
+func TestFetchDeliveryPartnerByID(t *testing.T) {
+	mock, repo := setUpDeliveryPartnerTest()
+	partnerID := int64(1)
+
+	mock.ExpectQuery("SELECT \\* FROM \"delivery_partners\" WHERE id = \\$1 AND \"delivery_partners\".\"deleted_at\" IS NULL ORDER BY \"delivery_partners\".\"id\" LIMIT \\$2").
+		WithArgs(partnerID, 1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "x_cordinate", "y_cordinate", "availability"}).
+			AddRow(1, "testName1", 40.2, 30.2, "available"))
+
+	result, err := repo.Fetch(partnerID)
+
+	if err != nil {
+		t.Fatalf("Error not expected but encountered: %v", err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+	if int64(result.ID) != partnerID {
+		t.Fatalf("Unexpected Result: The fetched partner should have ID %d", partnerID)
+	}
+}
