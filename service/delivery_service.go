@@ -22,7 +22,7 @@ func (service *DeliveryService) Initiate(req *pb.DeliveryRequest) (*pb.Response,
 		return nil, err
 	}
 	delivery.AssignDeliveryPartner(*deliveryPartner)
-	updateErr := service.DeliveryPartnerService.UpdateAvailability(int64(deliveryPartner.ID), "unavailable")
+	updateErr := service.DeliveryPartnerService.UpdateAvailability(int64(deliveryPartner.ID), "Unavailable")
 	if updateErr != nil {
 		return nil, updateErr
 	}
@@ -44,7 +44,7 @@ func (service *DeliveryService) MarkDelivered(req *pb.DeliveredRequest) (*pb.Del
 		return nil, status.Errorf(codes.Canceled, "Order is already delivered.")
 	}
 	delivery.MarkDelivered()
-	updateErr := service.DeliveryPartnerService.UpdateAvailability(int64(delivery.DeliveryPartnerID), "available")
+	updateErr := service.DeliveryPartnerService.UpdateAvailability(int64(delivery.DeliveryPartnerID), "Available")
 	if updateErr != nil {
 		return nil, updateErr
 	}

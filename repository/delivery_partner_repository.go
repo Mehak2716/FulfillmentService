@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"fulfillment/models"
 
 	"gorm.io/gorm"
@@ -25,6 +26,7 @@ func (repo *DeliveryPartnerRepository) IsExists(username string) bool {
 		Where("delivery_partners.username = ? AND delivery_partners.deleted_at IS NULL", username).
 		Count(&count)
 
+	fmt.Print(count)
 	return count > 0
 }
 
@@ -34,7 +36,7 @@ func (repo *DeliveryPartnerRepository) FetchNearest(location models.Location) (*
 	res := repo.DB.Raw(`
     SELECT delivery_partners.*
     FROM delivery_partners
-    WHERE delivery_partners.availability = 'available'
+    WHERE delivery_partners.availability = 'Available'
     ORDER BY ST_Distance(
         ST_MakePoint(?, ?)::geography,
         ST_MakePoint(delivery_partners.x_cordinate, delivery_partners.y_cordinate)::geography

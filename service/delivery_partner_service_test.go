@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fulfillment/models"
 	pb "fulfillment/proto/fulfillment"
 	"fulfillment/repository"
 	"testing"
@@ -86,48 +87,108 @@ func TestRegisterDeliveryPartnerSuccessfully(t *testing.T) {
 	}
 }
 
-// func TestGetNearestDeliveryPartnerSuccessfully(t *testing.T) {
-// 	mock, service := setUpDeliveryPartnerServiceTest()
-// 	req := &pb.Location{
-// 		XCordinate: 40,
-// 		YCordinate: 30,
-// 	}
+func TestGetNearestDeliveryPartner(t *testing.T) {
+	mock, service := setUpDeliveryPartnerServiceTest()
+	location := models.Location{
+		XCordinate: 40.0,
+		YCordinate: 30.0,
+	}
 
-// 	rows := sqlmock.NewRows([]string{"id", "username", "password", "availability"}).
-// 		AddRow(1, "testUsername", "testPassword", "available")
-// 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
-// 		WillReturnRows(rows)
-// 	res, err := service.GetNearest(req)
+	mock.ExpectQuery("SELECT delivery_partners.* FROM delivery_partners").
+		WithArgs(location.XCordinate, location.YCordinate).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "x_cordinate", "y_cordinate", "availability"}).
+			AddRow(1, "testName1", 40.05, 30.05, "available").
+			AddRow(2, "testName2", 40.2, 30.2, "available").
+			AddRow(3, "testName3", 40.3, 30.3, "available"))
 
-// 	if err != nil {
-// 		t.Fatalf("Error not expected but encountered: %v", err)
-// 	}
-// 	if err := mock.ExpectationsWereMet(); err != nil {
-// 		t.Errorf("Unfulfilled expectations: %s", err)
-// 	}
-// 	if res == nil || res.Id != 1 || res.Username != "testUsername" {
-// 		t.Fatal("Unexpected Result")
-// 	}
-// }
+	nearestDeliveryPartner, err := service.GetNearest(location)
 
-// func TestGetNearestDeliveryPartnerForNoResult(t *testing.T) {
-// 	mock, service := setUpDeliveryPartnerServiceTest()
-// 	req := &pb.Location{
-// 		XCordinate: 40,
-// 		YCordinate: 30,
-// 	}
+	if err != nil {
+		t.Fatalf("Error not expected but encountered: %v", err)
+	}
 
-// 	mock.ExpectQuery("SELECT delivery_partners.* FROM locations").
-// 		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "password", "availability"}))
-// 	res, err := service.GetNearest(req)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
 
-// 	if err == nil {
-// 		t.Fatalf("Error expected but not encountered")
-// 	}
-// 	if err := mock.ExpectationsWereMet(); err != nil {
-// 		t.Errorf("Unfulfilled expectations: %s", err)
-// 	}
-// 	if res != nil {
-// 		t.Fatal("Expected nil result, but got a non-nil result")
-// 	}
-// }
+	if nearestDeliveryPartner.ID != 1 {
+		t.Fatalf("Unexpected Result: The nearest partner should have ID 1")
+	}
+}
+
+func TestGetNearestDeliveryPartnerNotFound(t *testing.T) {
+	mock, service := setUpDeliveryPartnerServiceTest()
+	location := models.Location{
+		XCordinate: 40.0,
+		YCordinate: 30.0,
+	}
+
+	mock.ExpectQuery("SELECT delivery_partners.* FROM delivery_partners").
+		WithArgs(location.XCordinate, location.YCordinate).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "x_cordinate", "y_cordinate", "availability"}))
+
+	_, err := service.GetNearest(location)
+
+	if err != nil {
+		gRPCStatus, ok := status.FromError(err)
+		if !ok {
+			t.Fatal("Expected gRPC status error but got a different type of error")
+		}
+		expectedStatusCode := codes.NotFound
+		if gRPCStatus.Code() != expectedStatusCode {
+			t.Fatalf("Expected error code: %v, but got: %v", expectedStatusCode, gRPCStatus.Code())
+		}
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+
+}
+func TestUpdateDeliveryPartnerAvailabilitySuccessfully(t *testing.T) {
+	mock, service := setUpDeliveryPartnerServiceTest()
+	id := int64(1)
+	availability := "unavailable"
+
+	mock.ExpectQuery("SELECT \\* FROM \"delivery_partners\" WHERE id = \\$1 AND \"delivery_partners\".\"deleted_at\" IS NULL ORDER BY \"delivery_partners\".\"id\" LIMIT \\$2").
+		WithArgs(id, 1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "x_cordinate", "y_cordinate", "availability"}).
+			AddRow(id, "testName1", 40.2, 30.2, "available"))
+
+	err := service.UpdateAvailability(id, availability)
+
+	if err != nil {
+		t.Fatalf("Error not expected but encountered: %v", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+}
+
+func TestUpdateDeliveryPartnerAvailabilityForNotFoundPartner(t *testing.T) {
+	mock, service := setUpDeliveryPartnerServiceTest()
+	id := int64(1)
+	availability := "unavailable"
+
+	mock.ExpectQuery("SELECT \\* FROM \"delivery_partners\" WHERE id = \\$1 AND \"delivery_partners\".\"deleted_at\" IS NULL ORDER BY \"delivery_partners\".\"id\" LIMIT \\$2").
+		WithArgs(id, 1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username", "x_cordinate", "y_cordinate", "availability"}))
+
+	err := service.UpdateAvailability(id, availability)
+
+	if err != nil {
+		gRPCStatus, ok := status.FromError(err)
+		if !ok {
+			t.Fatal("Expected gRPC status error but got a different type of error")
+		}
+		expectedStatusCode := codes.NotFound
+		if gRPCStatus.Code() != expectedStatusCode {
+			t.Fatalf("Expected error code: %v, but got: %v", expectedStatusCode, gRPCStatus.Code())
+		}
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+}
