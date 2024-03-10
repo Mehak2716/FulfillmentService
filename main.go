@@ -16,8 +16,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-const servePort string = ":9000"
-
 func main() {
 	err := godotenv.Load(".env")
 	servePort := os.Getenv("SERVER_PORT")

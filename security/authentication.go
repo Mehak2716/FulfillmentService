@@ -38,10 +38,14 @@ func (auth *Auth) isAuthenticated(ctx context.Context) error {
 		return status.Errorf(codes.Unauthenticated, "invalid credentials format")
 	}
 	username := credentials[0]
+	password := credentials[1]
 
 	if !auth.Repo.IsExists(username) {
 		return status.Errorf(codes.Unauthenticated, "Invalid Credentials.User does not exist.")
 	}
 
+	if !auth.Repo.IsCredentialsCorrect(username, password) {
+		return status.Errorf(codes.Unauthenticated, "Incorrect Password.")
+	}
 	return nil
 }

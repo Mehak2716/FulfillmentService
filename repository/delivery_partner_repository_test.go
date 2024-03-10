@@ -82,6 +82,42 @@ func TestIsExistsForNonExistingDeliveryPartnerSuccessfully(t *testing.T) {
 	}
 }
 
+func TestIsCredentialsCorrectForCorrectCredentials(t *testing.T) {
+	mock, repo := setUpDeliveryPartnerTest()
+	username := "testUsername"
+	password := "testPassword"
+
+	rows := sqlmock.NewRows([]string{"count"}).AddRow(1)
+	mock.ExpectQuery("SELECT count(.+) FROM (.+)").
+		WillReturnRows(rows)
+	result := repo.IsCredentialsCorrect(username, password)
+
+	if !result {
+		t.Fatalf("Expected IsCredentialsCorrect to return true, but got false")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+}
+
+func TestIsCredentialsCorrectForIncorrectCredentials(t *testing.T) {
+	mock, repo := setUpDeliveryPartnerTest()
+	username := "testUsername"
+	password := "incorrectPassword"
+
+	rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
+	mock.ExpectQuery("SELECT count(.+) FROM (.+)").
+		WillReturnRows(rows)
+	result := repo.IsCredentialsCorrect(username, password)
+
+	if result {
+		t.Fatalf("Expected IsCredentialsCorrect to return false, but got true")
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %s", err)
+	}
+}
+
 func TestFetchNearestDeliveryPartner(t *testing.T) {
 	mock, repo := setUpDeliveryPartnerTest()
 	location := models.Location{

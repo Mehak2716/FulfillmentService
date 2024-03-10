@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"fulfillment/models"
 
 	"gorm.io/gorm"
@@ -26,7 +25,15 @@ func (repo *DeliveryPartnerRepository) IsExists(username string) bool {
 		Where("delivery_partners.username = ? AND delivery_partners.deleted_at IS NULL", username).
 		Count(&count)
 
-	fmt.Print(count)
+	return count > 0
+}
+
+func (repo *DeliveryPartnerRepository) IsCredentialsCorrect(username string, password string) bool {
+	var count int64
+	repo.DB.Model(&models.DeliveryPartner{}).
+		Where("delivery_partners.username = ? AND delivery_partners.password = ? AND delivery_partners.deleted_at IS NULL", username, password).
+		Count(&count)
+
 	return count > 0
 }
 

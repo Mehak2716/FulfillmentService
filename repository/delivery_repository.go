@@ -11,6 +11,7 @@ type DeliveryRepository struct {
 }
 
 func (repo *DeliveryRepository) Save(delivery *models.Delivery) error {
+
 	res := repo.DB.Create(delivery)
 
 	if res.Error != nil {
